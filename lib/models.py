@@ -19,6 +19,10 @@ class Audition(Base):
     hired = Column(Boolean(), default=False)
     role_id = Column(Integer(), ForeignKey('roles.id'))
 
+    def call_back(self):
+        self.hired = True
+        return self
+
     def __repr__(self):
         return f'Audition(Actor: {self.actor}, Hired: {self.hired})'
     
@@ -29,6 +33,32 @@ class Role(Base):
     character_name = Column(String())
 
     auditions = relationship('Audition', backref='role')
+
+    def get_actors(self):
+        actors = []
+        for audition in self.auditions:
+            actors.append(audition.actor)
+        return actors
+    
+    def get_locations(self):
+        locations = []
+        for audition in self.auditions:
+            locations.append(audition.location)
+        return locations
+    
+    def lead(self):
+        for audition in self.auditions:
+            if audition.hired:
+                return audition
+            else:
+                return 'no actor has been hired for this role'
+            
+    def under_study(self):
+        hires = []
+        for audition in self.auditions:
+            if audition.hired:
+                hires.append(audition)
+        return hires[1] if hires else 'no actor has been hired for understudy for this role' 
 
     def __repr__(self):
         return f'Role(Character name: {self.character_name})'
